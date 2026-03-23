@@ -1,52 +1,75 @@
 'use client';
+
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { saveSession } from '../../lib/auth';
+import Link from 'next/link';
+import { saveSession, clearSession } from '../../lib/auth';
+
+interface SignUpForm {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+}
+
+interface AuthResponse {
+  token?: string;
+  email?: string;
+  firstName?: string;
+  lastName?: string;
+  role?: string;
+  message?: string;
+}
 
 export default function SignUpPage() {
   const router = useRouter();
-  const [form, setForm] = useState({ firstName: '', lastName: '', email: '', password: '', confirm: '' });
+
+  const [form, setForm] = useState<SignUpForm>({
+    firstName: '',
+    lastName: '',
+    email: '',
+    password: '',
+  });
+
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
-
-  const validate = () => {
-    if (!form.firstName || !form.lastName) return 'First and last name are required.';
-    if (!form.email.includes('@')) return 'Please enter a valid email.';
-    if (form.password.length < 8) return 'Password must be at least 8 characters.';
-    if (form.password !== form.confirm) return 'Passwords do not match.';
-    return null;
+    setForm({
+      ...form,
+      [e.target.name]: e.target.value,
+    });
   };
 
   const handleSubmit = async () => {
-    const validationError = validate();
-    if (validationError) { setError(validationError); return; }
     setError('');
+
+    if (!form.firstName || !form.lastName || !form.email || !form.password) {
+      setError('Please complete all fields.');
+      return;
+    }
+
     setLoading(true);
+
     try {
       const res = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: form.email,
-          password: form.password,
-          firstName: form.firstName,
-          lastName: form.lastName,
-        }),
+        body: JSON.stringify(form),
       });
-      const data = await res.json();
+
+      const data: AuthResponse = await res.json();
+
       if (!res.ok) {
         setError(data.message || 'Sign up failed');
       } else {
-        saveSession(data.token, {
-          email: data.email,
-          firstName: data.firstName,
-          lastName: data.lastName,
-          role: data.role,
+        saveSession(data.token || '', {
+          email: data.email || '',
+          firstName: data.firstName || '',
+          lastName: data.lastName || '',
+          role: data.role || '',
         });
+
         router.push('/search');
       }
     } catch {
@@ -59,7 +82,6 @@ export default function SignUpPage() {
   return (
     <main className="min-h-screen bg-gray-50 flex items-center justify-center">
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 w-full max-w-md">
-
         <div className="text-center mb-8">
           <h1 className="text-2xl font-bold text-gray-900">Motion Industries</h1>
           <p className="text-gray-500 text-sm mt-1">Create your account</p>
@@ -72,80 +94,61 @@ export default function SignUpPage() {
         )}
 
         <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">First Name</label>
-              <input
-                type="text"
-                name="firstName"
-                value={form.firstName}
-                onChange={handleChange}
-                placeholder="John"
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
-              <input
-                type="text"
-                name="lastName"
-                value={form.lastName}
-                onChange={handleChange}
-                placeholder="Doe"
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
-              />
-            </div>
-          </div>
+          <input
+            type="text"
+            name="firstName"
+            value={form.firstName}
+            onChange={handleChange}
+            placeholder="First Name"
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+          />
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-            <input
-              type="email"
-              name="email"
-              value={form.email}
-              onChange={handleChange}
-              placeholder="you@company.com"
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
-            />
-          </div>
+          <input
+            type="text"
+            name="lastName"
+            value={form.lastName}
+            onChange={handleChange}
+            placeholder="Last Name"
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+          />
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
-            <input
-              type="password"
-              name="password"
-              value={form.password}
-              onChange={handleChange}
-              placeholder="Min 8 characters"
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
-            />
-          </div>
+          <input
+            type="email"
+            name="email"
+            value={form.email}
+            onChange={handleChange}
+            placeholder="Email"
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+          />
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
-            <input
-              type="password"
-              name="confirm"
-              value={form.confirm}
-              onChange={handleChange}
-              placeholder="Re-enter password"
-              onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
-            />
-          </div>
+          <input
+            type="password"
+            name="password"
+            value={form.password}
+            onChange={handleChange}
+            placeholder="Password"
+            onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+          />
 
           <button
             onClick={handleSubmit}
             disabled={loading}
-            className="w-full bg-teal-600 hover:bg-teal-700 disabled:opacity-50 text-white py-2.5 rounded-lg font-medium text-sm transition"
+            className="w-full bg-teal-600 hover:bg-teal-700 disabled:opacity-50 text-white py-2.5 rounded-lg font-medium text-sm"
           >
-            {loading ? 'Creating account...' : 'Create Account'}
+            {loading ? 'Creating account...' : 'Sign Up'}
           </button>
         </div>
 
         <p className="text-center text-sm text-gray-500 mt-6">
           Already have an account?{' '}
-          <a href="/signin" className="text-teal-600 hover:underline font-medium">Sign in</a>
+          <Link
+            href="/signin"
+            onClick={() => clearSession()}
+            className="text-teal-600 hover:underline font-medium"
+          >
+            Sign in
+          </Link>
         </p>
       </div>
     </main>
