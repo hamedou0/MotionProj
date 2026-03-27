@@ -38,13 +38,21 @@ export default function SearchPage() {
       setProducts(data);
     } catch {
       const normalizedQuery = searchQuery.trim().toLowerCase();
+      const singularQuery = normalizedQuery.endsWith('s')
+        ? normalizedQuery.slice(0, -1)
+        : normalizedQuery;
 
       const filteredMockProducts = !normalizedQuery
         ? mockProducts
         : mockProducts.filter((product) => {
             const name = product.name.toLowerCase();
             const partNumber = product.partNumber.toLowerCase();
-            return name.includes(normalizedQuery) || partNumber.includes(normalizedQuery);
+            return (
+              name.includes(normalizedQuery) ||
+              partNumber.includes(normalizedQuery) ||
+              (singularQuery !== normalizedQuery &&
+                (name.includes(singularQuery) || partNumber.includes(singularQuery)))
+            );
           });
 
       setProducts(filteredMockProducts);
