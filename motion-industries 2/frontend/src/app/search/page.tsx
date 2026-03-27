@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 
 type Product = {
   id: number;
@@ -18,6 +19,7 @@ const mockProducts: Product[] = [
 ];
 
 export default function SearchPage() {
+  const searchParams = useSearchParams();
   const [query, setQuery] = useState('');
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(false);
@@ -52,8 +54,10 @@ export default function SearchPage() {
   };
 
   useEffect(() => {
-    search('');
-  }, []);
+    const urlSearchParam = searchParams.get('search') || '';
+    setQuery(urlSearchParam);
+    search(urlSearchParam);
+  }, [searchParams]);
 
   return (
     <main className="min-h-screen bg-gray-50">
