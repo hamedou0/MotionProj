@@ -1,22 +1,71 @@
 'use client';
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
+
+type Product = {
+  id: number;
+  partNumber: string;
+  name: string;
+  price: number;
+};
+
+const mockProducts: Product[] = [
+  { id: 1, partNumber: 'MI-1001', name: 'Hydraulic Pump Assembly', price: 249.99 },
+  { id: 2, partNumber: 'MI-1002', name: 'Industrial Bearing Kit', price: 89.5 },
+  { id: 3, partNumber: 'MI-1003', name: 'Pneumatic Valve Controller', price: 134.75 },
+  { id: 4, partNumber: 'MI-1004', name: 'Conveyor Belt Motor', price: 319.0 },
+  { id: 5, partNumber: 'MI-1005', name: 'Pressure Sensor Module', price: 59.95 },
+  { id: 6, partNumber: 'MI-1006', name: 'Safety Relay Switch', price: 42.25 },
+];
 
 export default function SearchPage() {
+  const searchParams = useSearchParams();
   const [query, setQuery] = useState('');
-  const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const search = async () => {
+  const search = async (searchQuery = query) => {
     setLoading(true);
-    const res = await fetch(`/api/products?search=${query}`);
-    const data = await res.json();
-    setProducts(data);
-    setLoading(false);
+
+    try {
+      const res = await fetch(`/api/products?search=${encodeURIComponent(searchQuery)}`);
+
+      if (!res.ok) {
+        throw new Error('Failed to fetch products');
+      }
+
+      const data: Product[] = await res.json();
+      setProducts(data);
+    } catch {
+      const normalizedQuery = searchQuery.trim().toLowerCase();
+      const singularQuery = normalizedQuery.endsWith('s')
+        ? normalizedQuery.slice(0, -1)
+        : normalizedQuery;
+
+      const filteredMockProducts = !normalizedQuery
+        ? mockProducts
+        : mockProducts.filter((product) => {
+            const name = product.name.toLowerCase();
+            const partNumber = product.partNumber.toLowerCase();
+            return (
+              name.includes(normalizedQuery) ||
+              partNumber.includes(normalizedQuery) ||
+              (singularQuery !== normalizedQuery &&
+                (name.includes(singularQuery) || partNumber.includes(singularQuery)))
+            );
+          });
+
+      setProducts(filteredMockProducts);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
-    search();
-  }, []);
+    const urlSearchParam = searchParams.get('search') || '';
+    setQuery(urlSearchParam);
+    search(urlSearchParam);
+  }, [searchParams]);
 
   return (
     <main className="min-h-screen bg-gray-50">
@@ -37,7 +86,7 @@ export default function SearchPage() {
             className="flex-1 border border-gray-300 rounded-lg px-4 py-2 text-sm"
           />
           <button
-            onClick={search}
+            onClick={() => search()}
             className="bg-teal-600 hover:bg-teal-700 text-white px-6 py-2 rounded-lg text-sm"
           >
             Search
@@ -46,9 +95,11 @@ export default function SearchPage() {
 
         {loading ? (
           <p className="text-gray-500">Loading...</p>
+        ) : products.length === 0 ? (
+          <p className="text-gray-500">No Results Found.</p>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {products.map((p: any) => (
+            {products.map((p) => (
               <a
                 key={p.id}
                 href={`/product/${p.id}`}
