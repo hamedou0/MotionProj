@@ -54,7 +54,8 @@ public class JwtUtil {
         .parseClaimsJws(token)
         .getBody();
     }
-
+    
+    // converts the secret string into a Key object jjwt can use
     private Key getSigningKey(){
         return Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
     }
