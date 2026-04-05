@@ -23,9 +23,11 @@ export default function SearchPage() {
   const [query, setQuery] = useState('');
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(false);
+  const [usingFallback, setUsingFallback] = useState(false);
 
   const search = async (searchQuery = query) => {
     setLoading(true);
+    setUsingFallback(false);
 
     try {
       const res = await fetch(`/api/products?search=${encodeURIComponent(searchQuery)}`);
@@ -37,6 +39,8 @@ export default function SearchPage() {
       const data: Product[] = await res.json();
       setProducts(data);
     } catch {
+      setUsingFallback(true);
+
       const normalizedQuery = searchQuery.trim().toLowerCase();
       const singularQuery = normalizedQuery.endsWith('s')
         ? normalizedQuery.slice(0, -1)
@@ -93,8 +97,17 @@ export default function SearchPage() {
           </button>
         </div>
 
+        {usingFallback && (
+          <div className="bg-amber-50 border border-amber-200 text-amber-800 px-4 py-3 rounded-lg mb-6 text-sm">
+            Live product data is unavailable right now. Showing sample results.
+          </div>
+        )}
+
         {loading ? (
-          <p className="text-gray-500">Loading...</p>
+          <div className="flex items-center gap-3 py-2 text-gray-600">
+            <span className="h-5 w-5 rounded-full border-2 border-gray-300 border-t-teal-600 animate-spin" />
+            <span className="text-sm">Loading products...</span>
+          </div>
         ) : products.length === 0 ? (
           <p className="text-gray-500">No Results Found.</p>
         ) : (
