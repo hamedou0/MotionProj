@@ -2,6 +2,42 @@
 
 import { useState } from 'react';
 
+type ProductCategory = {
+  name: string;
+  items: string[];
+};
+
+const productCategories: ProductCategory[] = [
+  {
+    name: 'Bearings',
+    items: ['Ball Bearings', 'Roller Bearings', 'Mounted Bearings'],
+  },
+  {
+    name: 'Chemicals',
+    items: ['Cleaning Agents', 'Lubricants', 'Solvents'],
+  },
+  {
+    name: 'Electrical',
+    items: ['Motors', 'Power Supplies', 'Sensors'],
+  },
+  {
+    name: 'Facility Maintenance',
+    items: ['Cleaning Supplies', 'Lubricants', 'Storage'],
+  },
+  {
+    name: 'Hose & Fittings',
+    items: ['Air Hoses', 'Couplings', 'Tube Fittings'],
+  },
+  {
+    name: 'Hydraulics',
+    items: ['Hydraulic Pumps', 'Hydraulic Valves', 'Hydraulic Hoses'],
+  },
+  {
+    name: 'Safety',
+    items: ['Gloves', 'Helmets', 'Protective Eyewear'],
+  },
+];
+
 const featuredSolutions = [
   {
     title: 'MRO Solutions',
@@ -28,9 +64,19 @@ const popularCategories = [
 
 export default function HomePage() {
   const [query, setQuery] = useState('');
+  const [megaMenuOpen, setMegaMenuOpen] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<ProductCategory>(productCategories[0]);
 
   const goToSearch = () => {
     window.location.href = `/search?search=${encodeURIComponent(query)}`;
+  };
+
+  const handleSelectItem = (itemName: string) => {
+    window.location.href = `/search?search=${encodeURIComponent(itemName)}`;
+  };
+
+  const handleSelectCategory = (category: ProductCategory) => {
+    setSelectedCategory(category);
   };
 
   return (
@@ -47,7 +93,9 @@ export default function HomePage() {
       </nav>
 
       <section className="max-w-5xl mx-auto px-6 pt-16 pb-10 text-center">
-        <p className="text-sm font-semibold tracking-wide text-teal-700 uppercase mb-3">Motion Industries Capstone</p>
+        <p className="text-sm font-semibold tracking-wide text-teal-700 uppercase mb-3">
+          Motion Industries Capstone
+        </p>
         <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
           Discover Industrial Products Faster
         </h2>
@@ -59,12 +107,60 @@ export default function HomePage() {
       <section className="max-w-5xl mx-auto px-6 pb-14">
         <div className="bg-white border border-gray-200 rounded-xl p-4 md:p-5 shadow-sm">
           <div className="flex flex-col md:flex-row gap-3">
-            <select
-              className="border border-gray-300 rounded-lg px-4 py-2 text-sm bg-white md:w-52"
-              defaultValue="all"
-            >
-              <option value="all">All Products</option>
-            </select>
+            <div className="relative md:w-52">
+              <button
+                onClick={() => setMegaMenuOpen(!megaMenuOpen)}
+                className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm bg-white hover:bg-gray-50 text-left font-medium flex items-center justify-between"
+              >
+                All Products
+                <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 9l6 6 6-6" />
+                </svg>
+              </button>
+
+              {megaMenuOpen && (
+                <div className="absolute top-full left-0 mt-1 bg-white border border-gray-300 rounded-lg shadow-lg z-50 md:w-[36rem]">
+                  <div className="flex">
+                    <div className="w-52 border-r border-gray-200 py-2">
+                      {productCategories.map((category) => (
+                        <button
+                          key={category.name}
+                          onClick={() => handleSelectCategory(category)}
+                          className={`w-full text-left px-4 py-3 text-sm font-medium transition ${
+                            selectedCategory.name === category.name
+                              ? 'bg-teal-50 text-teal-700 border-l-2 border-teal-700'
+                              : 'text-gray-700 hover:bg-gray-50'
+                          }`}
+                        >
+                          {category.name}
+                        </button>
+                      ))}
+                    </div>
+
+                    <div className="flex-1 py-3 px-5">
+                      <p className="text-xs font-semibold text-gray-500 uppercase mb-3">
+                        {selectedCategory.name}
+                      </p>
+                      <div className="space-y-2">
+                        {selectedCategory.items.map((item) => (
+                          <button
+                            key={item}
+                            onClick={() => {
+                              setMegaMenuOpen(false);
+                              handleSelectItem(item);
+                            }}
+                            className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:text-teal-700 hover:bg-gray-50 rounded transition"
+                          >
+                            {item}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
             <input
               type="text"
               value={query}
