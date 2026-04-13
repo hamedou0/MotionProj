@@ -1,4 +1,5 @@
 // lib/auth.ts - session token helpers (Kerry's auth layer)
+import api  from "./api";
 
 export interface SessionUser {
   email: string;
@@ -32,20 +33,9 @@ export async function validateSession(): Promise<boolean> {
   if (!token) return false;
 
   try {
-    const res = await fetch('/api/auth/me', {
-      method: 'GET',
-      headers: {
-        Authorization: token,
-      },
-    });
-
-    if (!res.ok) {
-      clearSession();
-      return false;
-    }
-
+    await api.get('/auth/me');
     return true;
-  } catch {
+  } catch (error) {
     clearSession();
     return false;
   }
