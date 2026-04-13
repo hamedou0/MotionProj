@@ -6,6 +6,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.motionindustries.config.JwtUtil;
+import com.motionindustries.model.User;               
+import com.motionindustries.repository.UserRepository; 
+import java.util.Optional;       
+
 
 @RestController
 @RequestMapping("/api/auth")
@@ -14,6 +19,10 @@ public class AuthController {
 
     @Autowired
     private AuthService authService;
+    @Autowired
+    private JwtUtil jwtUtil; // for validating token in /me endpoint
+    @Autowired
+    private UserRepository userRepository; // for fetching user details in /me endpoint
 
     /**
      * POST /api/auth/signup
@@ -52,12 +61,30 @@ public class AuthController {
      * Returns current user from token (stub - wire up JWT later)
      */
     @GetMapping("/me")
-    public ResponseEntity<?> getCurrentUser(@RequestHeader(value = "Authorization", required = false) String token) {
-        if (token == null || token.isBlank()) {
+    public ResponseEntity<?> getCurrentUser(@RequestHeader(value = "Authorization", required = false) String authHeader) {
+        if(authHeader == null || !authHeader.startsWith("Bearer ")){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new AuthDTOs.AuthResponse("Not authenticated"));
+            .body(new AuthDTOs.AuthResponse("Not Authenticated"));
         }
-        // TODO: Validate JWT and return user — for now returns placeholder
-        return ResponseEntity.ok(new AuthDTOs.AuthResponse("valid-token", "user@example.com", "Test", "User", "USER"));
+        String token = authHeader.substring(7);
+        if(!jwtUtil.isTokenValid(token)){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+            .body(new AuthDTOs.AuthResponse("Invalid or expired token"));
+        }
+        String email = jwtUtil.extractEmail(token);
+        Optional<User> optionalUser = userRepository.findByEmail(email);
+        if(optionalUser.isEmpty()){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new AuthDTOs.AuthResponse("User not found"));
+        }
+        User user = optionalUser.get();
+        return ResponseEntity.ok(new AuthDTOs.AuthResponse(
+            null,
+            user.getEmail(),
+            user.getFirstName(),
+            user.getLastName(),
+            user.getRole()
+        ));
     }
+
 }
