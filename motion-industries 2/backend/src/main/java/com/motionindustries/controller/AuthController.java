@@ -9,7 +9,8 @@ import org.springframework.web.bind.annotation.*;
 import com.motionindustries.config.JwtUtil;
 import com.motionindustries.model.User;               
 import com.motionindustries.repository.UserRepository; 
-import java.util.Optional;       
+import java.util.Optional;      
+import jakarta.validation.Valid; 
 
 
 @RestController
@@ -46,7 +47,7 @@ public class AuthController {
      * Returns: { token, email, firstName, lastName, role }
      */
     @PostMapping("/signin")
-    public ResponseEntity<?> signIn(@RequestBody AuthDTOs.SignInRequest request) {
+    public ResponseEntity<?> signIn(@Valid @RequestBody AuthDTOs.SignInRequest request) {
         try {
             AuthDTOs.AuthResponse response = authService.signIn(request);
             return ResponseEntity.ok(response);
@@ -61,7 +62,7 @@ public class AuthController {
      * Returns current user from token (stub - wire up JWT later)
      */
     @GetMapping("/me")
-    public ResponseEntity<?> getCurrentUser(@RequestHeader(value = "Authorization", required = false) String authHeader) {
+    public ResponseEntity<?> getCurrentUser(@Valid @RequestHeader(value = "Authorization", required = false) String authHeader) {
         if(authHeader == null || !authHeader.startsWith("Bearer ")){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
             .body(new AuthDTOs.AuthResponse("Not Authenticated"));
