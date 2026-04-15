@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
+import ChatBotUI from "../../chatbot/ChatBotUI";
 
 type Product = {
   id: number; //JPA primary key from backend 
@@ -150,6 +151,7 @@ useEffect(() => {
           </div>
         </div>
       </div>
+      <ChatBotUI productId={product.id} />
     </main>
   );
 }
