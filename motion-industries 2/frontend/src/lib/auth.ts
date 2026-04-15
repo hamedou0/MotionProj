@@ -53,5 +53,5 @@ export async function validateSession(): Promise<boolean> {
 
 export function logout() {
   clearSession();
-  window.location.href = '/signin';
+  window.location.href = '/';
 }
