@@ -1,6 +1,5 @@
 package com.motionindustries.config;
 
-import com.motionindustries.config.JwtFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
