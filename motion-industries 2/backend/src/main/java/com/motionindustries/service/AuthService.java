@@ -34,7 +34,7 @@ public class AuthService {
 
         userRepository.save(user);
 
-        // Generate a simple session token (swap for JWT in production)
+        
         String token = jwtUtil.generateToken(user);
 
         return new AuthDTOs.AuthResponse(
