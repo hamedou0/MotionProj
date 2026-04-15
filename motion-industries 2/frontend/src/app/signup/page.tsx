@@ -70,7 +70,7 @@ export default function SignUpPage() {
           role: data.role || '',
         });
 
-        router.push('/search');
+        router.push('/');
       }
     } catch {
       setError('Something went wrong. Try again.');
