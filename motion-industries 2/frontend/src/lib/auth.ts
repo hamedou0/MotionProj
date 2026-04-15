@@ -9,20 +9,30 @@ export interface SessionUser {
 }
 
 export function saveSession(token: string, user: SessionUser) {
+  if (typeof window === 'undefined') return; // SSR guard
   localStorage.setItem('token', token);
   localStorage.setItem('user', JSON.stringify(user));
 }
 
 export function getToken(): string | null {
+  if (typeof window === 'undefined'){
+     return null; // SSR guard
+  }
   return localStorage.getItem('token');
 }
 
 export function getUser(): SessionUser | null {
+  if (typeof window === 'undefined') {
+    return null; // SSR guard
+  }
   const user = localStorage.getItem('user');
   return user ? JSON.parse(user) : null;
 }
 
 export function clearSession() {
+  if (typeof window === 'undefined') {
+    return; // SSR guard
+  }
   localStorage.removeItem('token');
   localStorage.removeItem('user');
 }
