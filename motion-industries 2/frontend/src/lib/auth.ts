@@ -1,4 +1,5 @@
 // lib/auth.ts - session token helpers (Kerry's auth layer)
+import api  from "./api";
 
 export interface SessionUser {
   email: string;
@@ -8,20 +9,30 @@ export interface SessionUser {
 }
 
 export function saveSession(token: string, user: SessionUser) {
+  if (typeof window === 'undefined') return; // SSR guard
   localStorage.setItem('token', token);
   localStorage.setItem('user', JSON.stringify(user));
 }
 
 export function getToken(): string | null {
+  if (typeof window === 'undefined'){
+     return null; // SSR guard
+  }
   return localStorage.getItem('token');
 }
 
 export function getUser(): SessionUser | null {
+  if (typeof window === 'undefined') {
+    return null; // SSR guard
+  }
   const user = localStorage.getItem('user');
   return user ? JSON.parse(user) : null;
 }
 
 export function clearSession() {
+  if (typeof window === 'undefined') {
+    return; // SSR guard
+  }
   localStorage.removeItem('token');
   localStorage.removeItem('user');
 }
@@ -32,20 +43,9 @@ export async function validateSession(): Promise<boolean> {
   if (!token) return false;
 
   try {
-    const res = await fetch('/api/auth/me', {
-      method: 'GET',
-      headers: {
-        Authorization: token,
-      },
-    });
-
-    if (!res.ok) {
-      clearSession();
-      return false;
-    }
-
+    await api.get('/auth/me');
     return true;
-  } catch {
+  } catch (error) {
     clearSession();
     return false;
   }
@@ -53,5 +53,5 @@ export async function validateSession(): Promise<boolean> {
 
 export function logout() {
   clearSession();
-  window.location.href = '/signin';
+  window.location.href = '/';
 }

@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { getUser, logout, SessionUser } from '../../lib/auth';
 
 type Product = {
   id: number;
@@ -21,9 +22,15 @@ const mockProducts: Product[] = [
 export default function SearchPage() {
   const searchParams = useSearchParams();
   const [query, setQuery] = useState('');
-  const [products, setProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState<Product[] | null>(null);
   const [loading, setLoading] = useState(false);
   const [usingFallback, setUsingFallback] = useState(false);
+  const [user, setUser] = useState<SessionUser | null>(null);
+
+  useEffect(() => {
+    setUser(getUser()); // popu;ates after hydration, mo ssr mismatch
+  }, []);
+
 
   const search = async (searchQuery = query) => {
     setLoading(true);
@@ -73,9 +80,25 @@ export default function SearchPage() {
 
   return (
     <main className="min-h-screen bg-gray-50">
-      <nav className="bg-gray-900 text-white px-6 py-4">
-        <a href="/" className="text-xl font-bold">Motion Industries</a>
-      </nav>
+      <nav className="bg-gray-900 text-white px-6 py-4 flex items-center justify-between">
+  <a href="/" className="text-xl font-bold">Motion Industries</a>
+  <div className="flex gap-3 items-center text-sm">
+    {user ? (
+      <>
+        <span className="text-teal-400">Hi, {user.firstName}</span>
+        <button onClick={logout}
+          className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-white text-sm">
+          Sign Out
+        </button>
+      </>
+    ) : (
+      <>
+        <a href="/signin" className="hover:text-teal-400">Sign In</a>
+        <a href="/signup" className="hover:text-teal-400">Sign Up</a>
+      </>
+    )}
+  </div>
+</nav>
 
       <div className="max-w-5xl mx-auto px-6 py-10">
         <h2 className="text-2xl font-bold mb-6">Product Search</h2>
@@ -108,8 +131,10 @@ export default function SearchPage() {
             <span className="h-5 w-5 rounded-full border-2 border-gray-300 border-t-teal-600 animate-spin" />
             <span className="text-sm">Loading products...</span>
           </div>
+        ) : products === null ? (
+          <p className="text-gray-400 text-sm">Enter a search term to find products</p>
         ) : products.length === 0 ? (
-          <p className="text-gray-500">No Results Found.</p>
+          <p className="text-gray-400 text-sm">No Results Found.</p>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {products.map((p) => (

@@ -2,9 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
+import ChatBotUI from "../../chatbot/ChatBotUI";
 
 type Product = {
-  partNumber: number;
+  id: number; //JPA primary key from backend 
+  partNumber: string;
   name: string;
   description: string;
   price: number;
@@ -12,33 +14,25 @@ type Product = {
   inStock: boolean;
 };
 
-const USE_MOCK = true;
 
 export default function ProductPage() {
   const { id } = useParams();
   const [product, setProduct] = useState<Product | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (USE_MOCK) {
-      const mockProduct: Product = {
-        partNumber: Number(id),
-        name: `Demo Product ${id}`,
-        description: "This is a sample product description for testing the product detail page.",
-        price: 49.99,
-        category: "Industrial Supplies",
-        inStock: true,
-      };
+useEffect(() => {
+  fetch(`/api/products/${id}`)
+    .then((res) => {
+      if (!res.ok) {
+        throw new Error(`Failed to load product: ${res.statusText}`);
+      }
+      return res.json();
+    })
+    .then((data) => setProduct(data))
+    .catch((err) => setError(err.message));
+}, [id]);
 
-      setTimeout(() => {
-        setProduct(mockProduct);
-      }, 300);
-    } else {
-      fetch(`/api/products/${id}`)
-        .then((res) => res.json())
-        .then((data) => setProduct(data))
-        .catch((err) => console.error("Failed to load product:", err));
-    }
-  }, [id]);
+
 
   const downloadCSV = () => {
     if (!product) return;
@@ -84,6 +78,9 @@ export default function ProductPage() {
     doc.save(`${product.partNumber}.pdf`);
   };
 
+  if(error){
+    return <p className="p-10 text-red-500">Error: {error}</p>;
+  }
   if (!product) {
     return <p className="p-10 text-gray-500">Loading...</p>;
   }
@@ -154,6 +151,7 @@ export default function ProductPage() {
           </div>
         </div>
       </div>
+      <ChatBotUI productId={product.id} />
     </main>
   );
 }

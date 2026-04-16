@@ -65,7 +65,7 @@ export default function SignInPage() {
           lastName: data.lastName || '',
           role: data.role || '',
         });
-        router.push('/search');
+        router.push('/');
       }
     } catch {
       setError('Something went wrong. Try again.');

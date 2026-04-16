@@ -1,5 +1,7 @@
 package com.motionindustries.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -15,6 +17,8 @@ import java.util.List;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+    @Autowired
+    private JwtFilter jwtFilter; // spring injects our custom JWT filter
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -29,7 +33,8 @@ public class SecurityConfig {
                 .requestMatchers("/api/chatbot/**").permitAll()
                 // Everything else requires auth
                 .anyRequest().authenticated()
-            );
+            )
+            .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class); // add our JWT filter before Spring's auth filter
 
         return http.build();
     }

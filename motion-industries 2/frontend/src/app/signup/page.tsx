@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { saveSession, clearSession } from '../../lib/auth';
+import { saveSession } from '../../lib/auth';
 
 interface SignUpForm {
   firstName: string;
@@ -70,7 +70,7 @@ export default function SignUpPage() {
           role: data.role || '',
         });
 
-        router.push('/search');
+        router.push('/');
       }
     } catch {
       setError('Something went wrong. Try again.');
@@ -144,7 +144,6 @@ export default function SignUpPage() {
           Already have an account?{' '}
           <Link
             href="/signin"
-            onClick={() => clearSession()}
             className="text-teal-600 hover:underline font-medium"
           >
             Sign in
