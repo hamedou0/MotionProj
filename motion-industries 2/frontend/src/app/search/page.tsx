@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { getUser, logout, SessionUser } from '../../lib/auth';
+import api from '../../lib/api';
 
 type Product = {
   id: number;
@@ -37,14 +38,8 @@ export default function SearchPage() {
     setUsingFallback(false);
 
     try {
-      const res = await fetch(`/api/products?search=${encodeURIComponent(searchQuery)}`);
-
-      if (!res.ok) {
-        throw new Error('Failed to fetch products');
-      }
-
-      const data: Product[] = await res.json();
-      setProducts(data);
+     const res = await api.get(`/products?search=${encodeURIComponent(searchQuery)}`);
+     setProducts(res.data as Product[]);
     } catch {
       setUsingFallback(true);
 
