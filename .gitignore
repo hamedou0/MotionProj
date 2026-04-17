@@ -17,6 +17,3 @@
 .vscode/
 .idea/
 .DS_Store
-
-# Claude (personal — not for teammates)
-.claude/
