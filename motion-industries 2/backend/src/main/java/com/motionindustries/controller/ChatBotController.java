@@ -1,7 +1,11 @@
 package com.motionindustries.controller;
 
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.*;
+import org.springframework.web.client.RestTemplate;
+import java.util.List;
 
 import java.util.Map;
 
@@ -10,20 +14,68 @@ import java.util.Map;
 @CrossOrigin(origins = "http://localhost:3000")
 public class ChatBotController {
 
-    /**
-     * POST /api/chatbot/message
-     * Body: { message: string, productId?: number }
-     * Returns: { reply: string }
-     *
-     * TODO: Wire up to an LLM API (OpenAI, Anthropic, etc.)
-     * For now returns rule-based responses based on keywords.
-     */
+    @Value("${grok.model}")
+    private String grokModel;
+    @Value("${groq.api.key}")
+    private String groqApiKey;
+    @Autowired
+    private RestTemplate restTemplate;
+
     @PostMapping("/message")
     public ResponseEntity<Map<String, String>> chat(@RequestBody Map<String, Object> body) {
         String message = (String) body.getOrDefault("message", "");
-        String reply = generateReply(message.toLowerCase());
-        return ResponseEntity.ok(Map.of("reply", reply));
+
+        try{
+            //Attempt real LLM call 
+            String reply = callGroq(message);
+            return ResponseEntity.ok(Map.of("reply", reply));
+        } catch (Exception e) {
+           // Groq is down, ley is wrong, or rate limtied - fall back to simple rule-based replies
+           String reply = generateReply(message.toLowerCase());
+           return ResponseEntity.ok(Map.of("reply", reply));
+        }
     }
+
+    private String callGroq(String userMassage){
+        // build the message list - system prompt set the assistant's role
+        Map<String, String> systemMsg = Map.of(
+            "role", "system",
+            "content" , "You are a helpful assistant for Motion Industries, " +
+                   "an industrial parts supplier. Answer questions about " +
+                   "products, pricing, stock availability, and exports. " +
+                   "Be concise — 2 to 3 sentences max."
+        );
+
+        Map<String, String> userMsg = Map.of(
+            "role", "user",
+            "content", userMassage
+        );
+
+        //Build the request body
+        Map<String, Object> requestBody = new java.util.HashMap<>();
+        requestBody.put("model", grokModel);
+        requestBody.put("messages", List.of(systemMsg, userMsg));
+        requestBody.put("max_tokens", 300);
+
+        // Groq uses Bearer token auth 
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + groqApiKey);
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<Map<String, Object>> request = new HttpEntity<>(requestBody, headers);
+
+        ResponseEntity<Map> response = restTemplate.postForEntity(
+            "https://api.groq.com/openai/v1/chat/completions",
+             request,
+              Map.class);
+
+              List<Map<String, Object>> choices = 
+              (List<Map<String,Object>>)
+              response.getBody().get("choices");  
+              Map<String, Object> messageObj = 
+              (Map<String, Object>) choices.get(0).get("message");
+              return (String) messageObj.get("content");
+              }
 
     private String generateReply(String message) {
         if (message.contains("price") || message.contains("cost")) {
