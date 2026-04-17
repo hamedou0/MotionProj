@@ -1,0 +1,22 @@
+# Build artifacts
+**/target/
+**/*.class
+
+# Frontend generated files
+**/node_modules/
+**/.next/
+**/next-env.d.ts
+**/package-lock.json
+**/tsconfig.json
+
+# Environment & secrets
+*.env
+**/.env.local
+
+# IDE & OS
+.vscode/
+.idea/
+.DS_Store
+
+# Claude (personal — not for teammates)
+.claude/

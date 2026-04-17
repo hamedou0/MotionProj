@@ -8,10 +8,12 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
-import java.util.UUID;
+import com.motionindustries.config.JwtUtil;
 
 @Service
 public class AuthService {
+    @Autowired
+    private JwtUtil jwtUtil; // spring injects token generator 
 
     @Autowired
     private UserRepository userRepository;
@@ -32,8 +34,8 @@ public class AuthService {
 
         userRepository.save(user);
 
-        // Generate a simple session token (swap for JWT in production)
-        String token = UUID.randomUUID().toString();
+        
+        String token = jwtUtil.generateToken(user);
 
         return new AuthDTOs.AuthResponse(
             token,
@@ -57,7 +59,7 @@ public class AuthService {
             throw new RuntimeException("Invalid email or password");
         }
 
-        String token = UUID.randomUUID().toString();
+        String token = jwtUtil.generateToken(user);
 
         return new AuthDTOs.AuthResponse(
             token,
