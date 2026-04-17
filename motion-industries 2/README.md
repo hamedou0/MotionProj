@@ -66,6 +66,7 @@ psql -U postgres -d motion_industries -f database/migrations/002_users.sql
 ```bash
 cd backend
 ./mvnw spring-boot:run
+ mvn spring-boot:run
 # Runs on http://localhost:8080
 ```
 
