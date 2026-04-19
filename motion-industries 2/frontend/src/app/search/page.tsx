@@ -153,15 +153,27 @@ export default function SearchPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {products.map((p) => (
-              <a
-                key={p.id}
-                href={`/product/${p.id}`}
-                className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition"
-              >
+              usingFallback ? (
+                <div
+                  key={p.id}
+                  className="bg-white border border-gray-200 rounded-lg p-4 transition"
+                >
+                  <p className="text-xs text-gray-400 mb-1">{p.partNumber}</p>
+                  <h3 className="font-semibold text-gray-900 mb-2">{p.name}</h3>
+                  <p className="text-teal-600 font-bold">${p.price}</p>
+                  <p className="mt-3 text-xs text-gray-500">Product details unavailable in sample mode</p>
+                </div>
+              ) : (
+                <a
+                  key={p.id}
+                  href={`/product/${p.id}`}
+                  className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition"
+                >
                 <p className="text-xs text-gray-400 mb-1">{p.partNumber}</p>
                 <h3 className="font-semibold text-gray-900 mb-2">{p.name}</h3>
                 <p className="text-teal-600 font-bold">${p.price}</p>
-              </a>
+                </a>
+              )
             ))}
           </div>
         )}
