@@ -87,21 +87,6 @@ useEffect(() => {
 
   return (
     <main className="min-h-screen bg-gray-50">
-      <nav className="bg-gray-900 text-white px-6 py-4 flex items-center justify-between">
-        <a href="/" className="text-xl font-bold">
-          Motion Industries
-        </a>
-
-        <div className="flex gap-4 text-sm">
-          <a href="/search" className="hover:text-teal-400">
-            Products
-          </a>
-          <a href="/signin" className="hover:text-teal-400">
-            Sign In
-          </a>
-        </div>
-      </nav>
-
       <div className="max-w-3xl mx-auto px-6 py-10">
         <a
           href="/search"
