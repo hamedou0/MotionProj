@@ -22,6 +22,7 @@ public class Product {
     private Double price;
     private String category;
     private Boolean inStock;
+    private String imageUrl;
 
     // Getters and setters
     public Long getId() { return id; }
@@ -44,4 +45,7 @@ public class Product {
 
     public Boolean getInStock() { return inStock; }
     public void setInStock(Boolean inStock) { this.inStock = inStock; }
+
+    public String getImageUrl() { return imageUrl; }
+    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
 }
