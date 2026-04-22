@@ -7,13 +7,14 @@ import api from "../../../lib/api";
 import { getUser, logout, SessionUser } from "../../../lib/auth";
 
 type Product = {
-  id: number; //JPA primary key from backend 
+  id: number; //JPA primary key from backend
   partNumber: string;
   name: string;
   description: string;
   price: number;
   category: string;
   inStock: boolean;
+  imageUrl?: string;
 };
 
 
@@ -119,13 +120,46 @@ const downloadCSV = () => {
     doc.setFillColor(255, 255, 255);
     doc.roundedRect(margin, ly - 4, fullWidth, 82, 2, 2, 'FD');
 
-    // Image placeholder
-    doc.setFillColor(243, 244, 246);
-    doc.setDrawColor(209, 213, 219);
-    doc.rect(margin + 4, ly, 20, 20, 'FD');
-    doc.setFontSize(6);
-    doc.setTextColor(156, 163, 175);
-    doc.text('No Image', margin + 14, ly + 11, { align: 'center' });
+    // Product image — proxy to bypass CORS, canvas to normalize format (WebP → PNG)
+    const drawImagePlaceholder = () => {
+      doc.setFillColor(243, 244, 246);
+      doc.setDrawColor(209, 213, 219);
+      doc.rect(margin + 4, ly, 20, 20, 'FD');
+      doc.setFontSize(6);
+      doc.setTextColor(156, 163, 175);
+      doc.text('No Image', margin + 14, ly + 11, { align: 'center' });
+    };
+
+    if (product.imageUrl) {
+      try {
+        const proxyUrl = `/api/image-proxy?url=${encodeURIComponent(product.imageUrl)}`;
+        const response = await fetch(proxyUrl);
+        if (!response.ok) throw new Error('proxy failed');
+        const blob = await response.blob();
+        const objectUrl = URL.createObjectURL(blob);
+        const imgEl = new Image();
+        await new Promise<void>((resolve, reject) => {
+          imgEl.onload = () => resolve();
+          imgEl.onerror = reject;
+          imgEl.src = objectUrl;
+        });
+        const MAX = 400;
+        const w = imgEl.naturalWidth || MAX;
+        const h = imgEl.naturalHeight || MAX;
+        const scale = Math.min(MAX / w, MAX / h, 1);
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.round(w * scale);
+        canvas.height = Math.round(h * scale);
+        canvas.getContext('2d')!.drawImage(imgEl, 0, 0, canvas.width, canvas.height);
+        const dataUrl = canvas.toDataURL('image/png');
+        URL.revokeObjectURL(objectUrl);
+        doc.addImage(dataUrl, 'PNG', margin + 4, ly, 20, 20);
+      } catch {
+        drawImagePlaceholder();
+      }
+    } else {
+      drawImagePlaceholder();
+    }
 
     // Brand | Part Number
     const infoX = margin + 28;
@@ -182,7 +216,7 @@ const downloadCSV = () => {
 
     if (product.inStock) {
       doc.setTextColor(22, 163, 74);
-      doc.text('✓ In stock', margin + 20, ly);
+      doc.text('In stock', margin + 20, ly);
     } else {
       doc.setTextColor(220, 38, 38);
       doc.text('Out of Stock', margin + 20, ly);
@@ -253,9 +287,13 @@ const downloadCSV = () => {
           <div className="flex-1 bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
             <div className="flex gap-4">
 
-              {/* Image placeholder */}
-              <div className="w-20 h-20 bg-gray-100 rounded-md flex items-center justify-center flex-shrink-0">
-                <span className="text-gray-400 text-xs text-center">No Image</span>
+              {/* Product image */}
+              <div className="w-20 h-20 bg-gray-100 rounded-md flex items-center justify-center flex-shrink-0 overflow-hidden">
+                {product.imageUrl ? (
+                  <img src={product.imageUrl} alt={product.name} className="w-full h-full object-contain" />
+                ) : (
+                  <span className="text-gray-400 text-xs text-center">No Image</span>
+                )}
               </div>
 
               {/* Product info */}
