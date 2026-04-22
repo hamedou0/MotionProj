@@ -75,7 +75,11 @@ export default function HomePage() {
   };
 
   const handleSelectItem = (itemName: string) => {
-    window.location.href = `/search?search=${encodeURIComponent(itemName)}`;
+    const params = new URLSearchParams({
+      category: selectedCategory.name,
+      sub: itemName,
+    });
+    window.location.href = `/search?${params.toString()}`;
   };
 
   const handleSelectCategory = (category: ProductCategory) => {
