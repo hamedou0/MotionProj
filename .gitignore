@@ -18,3 +18,7 @@ secrets.properties
 .vscode/
 .idea/
 .DS_Store
+
+# Logs
+**/*.log
+**/spring-boot.log
