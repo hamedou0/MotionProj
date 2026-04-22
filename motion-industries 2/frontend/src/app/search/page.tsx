@@ -3,12 +3,14 @@ import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { getUser, logout, SessionUser } from '../../lib/auth';
 import api from '../../lib/api';
+import { UI_CATEGORIES, UICategory, matchesUICategory } from '../../lib/categoryMap';
 
 type Product = {
   id: number;
   partNumber: string;
   name: string;
   price: number;
+  category?: string;
 };
 
 const mockProducts: Product[] = [
@@ -47,6 +49,8 @@ export default function SearchPage() {
   const [loading, setLoading] = useState(false);
   const [usingFallback, setUsingFallback] = useState(false);
   const [user, setUser] = useState<SessionUser | null>(null);
+  const [activeCategory, setActiveCategory] = useState<UICategory | 'All'>('All');
+  const [subFilter, setSubFilter] = useState('');
 
   useEffect(() => {
     setUser(getUser()); // popu;ates after hydration, mo ssr mismatch
@@ -88,9 +92,15 @@ export default function SearchPage() {
   };
 
   useEffect(() => {
-    const urlSearchParam = searchParams.get('search') || '';
-    setQuery(urlSearchParam);
-    search(urlSearchParam);
+    const urlSearch   = searchParams.get('search')   || '';
+    const urlCategory = searchParams.get('category') || '';
+    const urlSub      = searchParams.get('sub')      || '';
+
+    setQuery(urlSearch);
+    setSubFilter(urlSub);
+
+    const searchTerm = urlSearch || urlCategory;
+    search(searchTerm); // empty string → backend returns all products via findAll()
   }, [searchParams]);
 
   return (
@@ -141,18 +151,46 @@ export default function SearchPage() {
           </div>
         )}
 
+        <div className="flex gap-2 mb-6 flex-wrap">
+          {(['All', ...UI_CATEGORIES] as const).map((cat) => (
+            <button
+              key={cat}
+              onClick={() => {
+                setActiveCategory(cat);
+                if (products === null) search('');
+              }}
+              className={`px-4 py-1.5 rounded-full text-sm border transition ${
+                activeCategory === cat
+                  ? 'bg-teal-600 text-white border-teal-600'
+                  : 'bg-white text-gray-700 border-gray-300 hover:border-teal-400'
+              }`}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
+
         {loading ? (
           <div className="flex items-center gap-3 py-2 text-gray-600">
             <span className="h-5 w-5 rounded-full border-2 border-gray-300 border-t-teal-600 animate-spin" />
             <span className="text-sm">Loading products...</span>
           </div>
         ) : products === null ? (
-          <p className="text-gray-400 text-sm">Enter a search term to find products</p>
+          <p className="text-gray-400 text-sm">Loading products...</p>
         ) : products.length === 0 ? (
           <p className="text-gray-400 text-sm">No Results Found.</p>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {products.map((p) => (
+            {products
+              .filter((p) => {
+                if (activeCategory !== 'All' && !(p.category && matchesUICategory(p.category, activeCategory))) return false;
+                if (subFilter) {
+                  const phrase = subFilter.toLowerCase().replace(/s$/, '');
+                  if (!p.name.toLowerCase().includes(phrase)) return false;
+                }
+                return true;
+              })
+              .map((p) => (
               usingFallback ? (
                 <div
                   key={p.id}
