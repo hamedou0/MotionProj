@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import ChatBotUI from "../../chatbot/ChatBotUI";
 import api from "../../../lib/api";
-import { getUser, logout, SessionUser } from "../../../lib/auth";
 
 type Product = {
   id: number; //JPA primary key from backend
@@ -29,12 +28,6 @@ useEffect(() => {
     .catch((err) => setError(err.message));
 }, [id]);
 
-//SSR-Ssafe do not call getUser() directly in the component body, use useEffect to set user state after mount
-const [user, setUser] = useState<SessionUser | null>(null);
-useEffect(() =>{
-  setUser(getUser());
-}, []);
- 
 const downloadCSV = () => {
     if (!product) return;
 
@@ -243,32 +236,6 @@ const downloadCSV = () => {
 
   return (
     <main className="min-h-screen bg-gray-50">
-      <nav className="bg-gray-900 text-white px-6 py-4 flex items-center justify-between">
-        <a href="/" className="text-xl font-bold">
-          Motion Industries
-        </a>
-
-        <div className="flex gap-4 items-center text-sm">
-          <a href="/search" className="hover:text-teal-400">Products</a>
-          {user ? (
-            <>
-              <span className="text-teal-400">Hi, {user.firstName}</span>
-              <button
-                onClick={logout}
-                className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-white text-sm"
-              >
-                Sign Out
-              </button>
-            </>
-          ) : (
-            <>
-              <a href="/signin" className="hover:text-teal-400">Sign In</a>
-              <a href="/signup" className="hover:text-teal-400">Sign Up</a>
-            </>
-          )}
-        </div>
-      </nav>
-
       <div className="max-w-5xl mx-auto px-6 py-10">
         <a
           href="/search"
