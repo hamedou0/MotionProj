@@ -94,29 +94,30 @@ export default function SearchPage() {
   }, [searchParams]);
 
   return (
-    <main className="min-h-screen bg-gray-50">
-      <nav className="bg-gray-900 text-white px-6 py-4 flex items-center justify-between">
+    <main className="min-h-screen bg-[#F5F5F5] text-[#333333]">
+      <nav className="bg-[#222222] text-white px-6 py-4 flex items-center justify-between border-b border-[#D62828]/70 shadow-sm">
   <a href="/" className="text-xl font-bold">Motion Industries</a>
   <div className="flex gap-3 items-center text-sm">
     {user ? (
       <>
-        <span className="text-teal-400">Hi, {user.firstName}</span>
+        <span className="text-[#0C6CD4]">Hi, {user.firstName}</span>
         <button onClick={logout}
-          className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-white text-sm">
+          className="bg-[#0C6CD4] hover:bg-[#0a5bb2] px-4 py-2 rounded text-white text-sm">
           Sign Out
         </button>
       </>
     ) : (
       <>
-        <a href="/signin" className="hover:text-teal-400">Sign In</a>
-        <a href="/signup" className="hover:text-teal-400">Sign Up</a>
+        <a href="/signin" className="hover:text-[#0C6CD4]">Sign In</a>
+        <a href="/signup" className="text-[#0C6CD4] hover:text-[#D62828]">Register</a>
       </>
     )}
   </div>
 </nav>
 
       <div className="max-w-5xl mx-auto px-6 py-10">
-        <h2 className="text-2xl font-bold mb-6">Product Search</h2>
+        <h2 className="text-2xl font-bold mb-2 text-[#333333]">Product Search</h2>
+        <div className="h-0.5 w-10 bg-[#D62828] mb-6" />
 
         <div className="flex gap-3 mb-8">
           <input
@@ -125,11 +126,11 @@ export default function SearchPage() {
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && search()}
             placeholder="Search by name, part number..."
-            className="flex-1 border border-gray-300 rounded-lg px-4 py-2 text-sm"
+            className="flex-1 border border-[#BDBDBD] rounded-lg px-4 py-2 text-sm text-[#333333] bg-white"
           />
           <button
             onClick={() => search()}
-            className="bg-teal-600 hover:bg-teal-700 text-white px-6 py-2 rounded-lg text-sm"
+            className="bg-[#222222] hover:bg-[#111111] text-white px-6 py-2 rounded-lg text-sm"
           >
             Search
           </button>
@@ -142,36 +143,36 @@ export default function SearchPage() {
         )}
 
         {loading ? (
-          <div className="flex items-center gap-3 py-2 text-gray-600">
-            <span className="h-5 w-5 rounded-full border-2 border-gray-300 border-t-teal-600 animate-spin" />
+          <div className="flex items-center gap-3 py-2 text-[#555555]">
+            <span className="h-5 w-5 rounded-full border-2 border-[#BDBDBD] border-t-[#0C6CD4] animate-spin" />
             <span className="text-sm">Loading products...</span>
           </div>
         ) : products === null ? (
-          <p className="text-gray-400 text-sm">Enter a search term to find products</p>
+          <p className="text-[#666666] text-sm">Enter a search term to find products</p>
         ) : products.length === 0 ? (
-          <p className="text-gray-400 text-sm">No Results Found.</p>
+          <p className="text-[#666666] text-sm">No Results Found.</p>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {products.map((p) => (
               usingFallback ? (
                 <div
                   key={p.id}
-                  className="bg-white border border-gray-200 rounded-lg p-4 transition"
+                  className="bg-white border border-[#E5E5E5] rounded-lg p-4 transition shadow-sm"
                 >
-                  <p className="text-xs text-gray-400 mb-1">{p.partNumber}</p>
-                  <h3 className="font-semibold text-gray-900 mb-2">{p.name}</h3>
-                  <p className="text-teal-600 font-bold">${p.price}</p>
-                  <p className="mt-3 text-xs text-gray-500">Product details unavailable in sample mode</p>
+                  <p className="text-xs text-[#666666] mb-1">{p.partNumber}</p>
+                  <h3 className="font-semibold text-[#333333] mb-2">{p.name}</h3>
+                  <p className="text-[#0C6CD4] font-bold">${p.price}</p>
+                  <p className="mt-3 text-xs text-[#666666]">Product details unavailable in sample mode</p>
                 </div>
               ) : (
                 <a
                   key={p.id}
                   href={`/product/${p.id}`}
-                  className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition"
+                  className="bg-white border border-[#E5E5E5] rounded-lg p-4 hover:shadow-sm transition"
                 >
-                <p className="text-xs text-gray-400 mb-1">{p.partNumber}</p>
-                <h3 className="font-semibold text-gray-900 mb-2">{p.name}</h3>
-                <p className="text-teal-600 font-bold">${p.price}</p>
+                <p className="text-xs text-[#666666] mb-1">{p.partNumber}</p>
+                <h3 className="font-semibold text-[#333333] mb-2">{p.name}</h3>
+                <p className="text-[#0C6CD4] font-bold">${p.price}</p>
                 </a>
               )
             ))}

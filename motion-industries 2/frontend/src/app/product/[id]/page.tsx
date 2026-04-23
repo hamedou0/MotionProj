@@ -82,21 +82,21 @@ useEffect(() => {
     return <p className="p-10 text-red-500">Error: {error}</p>;
   }
   if (!product) {
-    return <p className="p-10 text-gray-500">Loading...</p>;
+    return <p className="p-10 text-[#666666]">Loading...</p>;
   }
 
   return (
-    <main className="min-h-screen bg-gray-50">
-      <nav className="bg-gray-900 text-white px-6 py-4 flex items-center justify-between">
+    <main className="min-h-screen bg-[#F5F5F5] text-[#333333]">
+      <nav className="bg-[#222222] text-white px-6 py-4 flex items-center justify-between border-b border-[#D62828]/70 shadow-sm">
         <a href="/" className="text-xl font-bold">
           Motion Industries
         </a>
 
         <div className="flex gap-4 text-sm">
-          <a href="/search" className="hover:text-teal-400">
+          <a href="/search" className="hover:text-[#0C6CD4]">
             Products
           </a>
-          <a href="/signin" className="hover:text-teal-400">
+          <a href="/signin" className="hover:text-[#0C6CD4]">
             Sign In
           </a>
         </div>
@@ -105,30 +105,31 @@ useEffect(() => {
       <div className="max-w-3xl mx-auto px-6 py-10">
         <a
           href="/search"
-          className="text-teal-600 text-sm mb-6 inline-block hover:text-teal-800"
+          className="text-[#0C6CD4] text-sm mb-6 inline-block hover:text-[#0a5bb2]"
         >
           ← Back to Search
         </a>
+        <div className="h-0.5 w-10 bg-[#D62828] mb-6" />
 
-        <div className="bg-white rounded-lg border border-gray-200 p-8 shadow-sm">
-          <p className="text-gray-400 text-sm mb-1">Product #{product.partNumber}</p>
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">{product.name}</h1>
-          <p className="text-gray-600 mb-6">{product.description}</p>
+        <div className="bg-white rounded-lg border border-[#E5E5E5] p-8 shadow-sm">
+          <p className="text-[#666666] text-sm mb-1">Product #{product.partNumber}</p>
+          <h1 className="text-3xl font-bold text-[#333333] mb-4">{product.name}</h1>
+          <p className="text-[#555555] mb-6">{product.description}</p>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-            <div className="bg-gray-50 rounded-md p-4">
-              <p className="text-sm text-gray-500">Price</p>
-              <p className="text-xl font-semibold text-teal-700">${product.price}</p>
+            <div className="bg-white border border-[#E5E5E5] rounded-md p-4">
+              <p className="text-sm text-[#666666]">Price</p>
+              <p className="text-xl font-semibold text-[#0C6CD4]">${product.price}</p>
             </div>
 
-            <div className="bg-gray-50 rounded-md p-4">
-              <p className="text-sm text-gray-500">Category</p>
+            <div className="bg-white border border-[#E5E5E5] rounded-md p-4">
+              <p className="text-sm text-[#666666]">Category</p>
               <p className="font-medium">{product.category}</p>
             </div>
 
-            <div className="bg-gray-50 rounded-md p-4">
-              <p className="text-sm text-gray-500">Availability</p>
-              <p className={product.inStock ? "font-medium text-green-600" : "font-medium text-red-600"}>
+            <div className="bg-white border border-[#E5E5E5] rounded-md p-4">
+              <p className="text-sm text-[#666666]">Availability</p>
+              <p className={product.inStock ? "font-medium text-[#0C6CD4]" : "font-medium text-[#D62828]"}>
                 {product.inStock ? "In Stock" : "Out of Stock"}
               </p>
             </div>
@@ -137,14 +138,14 @@ useEffect(() => {
           <div className="flex gap-3 border-t pt-6">
             <button
               onClick={downloadPDF}
-              className="flex-1 bg-gray-900 hover:bg-gray-700 text-white py-2.5 rounded-lg font-medium text-sm transition"
+              className="flex-1 bg-[#222222] hover:bg-[#111111] text-white py-2.5 rounded-lg font-medium text-sm transition"
             >
               Download PDF
             </button>
 
             <button
               onClick={downloadCSV}
-              className="flex-1 bg-teal-600 hover:bg-teal-700 text-white py-2.5 rounded-lg font-medium text-sm transition"
+              className="flex-1 bg-[#0C6CD4] hover:bg-[#0a5bb2] text-white py-2.5 rounded-lg font-medium text-sm transition"
             >
               Download CSV
             </button>

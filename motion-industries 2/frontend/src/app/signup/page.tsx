@@ -80,15 +80,15 @@ export default function SignUpPage() {
   };
 
   return (
-    <main className="min-h-screen bg-gray-50 flex items-center justify-center">
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 w-full max-w-md">
-        <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold text-gray-900">Motion Industries</h1>
-          <p className="text-gray-500 text-sm mt-1">Create your account</p>
+    <main className="min-h-screen bg-[#F5F5F5] flex items-center justify-center text-[#333333]">
+      <div className="bg-white rounded-xl shadow-sm border border-[#E5E5E5] p-8 w-full max-w-md">
+        <div className="text-center mb-8 -mx-8 -mt-8 px-8 py-6 bg-[#222222] text-white rounded-t-xl border-b border-[#D62828]/70">
+          <h1 className="text-2xl font-bold text-white">Motion Industries</h1>
+          <p className="text-gray-200 text-sm mt-1">Create your account</p>
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg px-4 py-3 text-sm mb-5">
+          <div className="bg-red-50 border border-red-200 text-[#D62828] rounded-lg px-4 py-3 text-sm mb-5">
             {error}
           </div>
         )}
@@ -100,7 +100,7 @@ export default function SignUpPage() {
             value={form.firstName}
             onChange={handleChange}
             placeholder="First Name"
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+            className="w-full border border-[#BDBDBD] rounded-lg px-3 py-2 text-sm bg-white text-[#333333]"
           />
 
           <input
@@ -109,7 +109,7 @@ export default function SignUpPage() {
             value={form.lastName}
             onChange={handleChange}
             placeholder="Last Name"
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+            className="w-full border border-[#BDBDBD] rounded-lg px-3 py-2 text-sm bg-white text-[#333333]"
           />
 
           <input
@@ -118,7 +118,7 @@ export default function SignUpPage() {
             value={form.email}
             onChange={handleChange}
             placeholder="Email"
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+            className="w-full border border-[#BDBDBD] rounded-lg px-3 py-2 text-sm bg-white text-[#333333]"
           />
 
           <input
@@ -128,23 +128,23 @@ export default function SignUpPage() {
             onChange={handleChange}
             placeholder="Password"
             onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+            className="w-full border border-[#BDBDBD] rounded-lg px-3 py-2 text-sm bg-white text-[#333333]"
           />
 
           <button
             onClick={handleSubmit}
             disabled={loading}
-            className="w-full bg-teal-600 hover:bg-teal-700 disabled:opacity-50 text-white py-2.5 rounded-lg font-medium text-sm"
+            className="w-full bg-[#0C6CD4] hover:bg-[#0a5bb2] disabled:opacity-50 text-white py-2.5 rounded-lg font-medium text-sm"
           >
             {loading ? 'Creating account...' : 'Sign Up'}
           </button>
         </div>
 
-        <p className="text-center text-sm text-gray-500 mt-6">
+        <p className="text-center text-sm text-[#666666] mt-6">
           Already have an account?{' '}
           <Link
             href="/signin"
-            className="text-teal-600 hover:underline font-medium"
+            className="text-[#0C6CD4] hover:underline font-medium"
           >
             Sign in
           </Link>
