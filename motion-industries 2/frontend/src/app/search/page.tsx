@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { getUser, logout, SessionUser } from '../../lib/auth';
 import api from '../../lib/api';
@@ -43,7 +43,8 @@ const mockProducts: Product[] = [
   { id: 26, partNumber: 'MI-1026', name: 'Tube Fittings', price: 21.75 },
 ];
 
-export default function SearchPage() {
+function SearchContent() {
+  const searchParams = useSearchParams();
   const [query, setQuery] = useState('');
   const [products, setProducts] = useState<Product[] | null>(null);
   const [loading, setLoading] = useState(false);
@@ -196,5 +197,13 @@ export default function SearchPage() {
         )}
       </div>
     </main>
+  );
+}
+
+export default function SearchPage() {
+  return (
+    <Suspense fallback={<p className="p-10 text-gray-500">Loading...</p>}>
+      <SearchContent />
+    </Suspense>
   );
 }
