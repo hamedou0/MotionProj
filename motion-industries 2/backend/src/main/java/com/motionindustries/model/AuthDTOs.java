@@ -46,6 +46,7 @@ public class AuthDTOs {
         private String firstName;
         private String lastName;
         private String role;
+        private String avatarUrl;
         private String message;
 
         public AuthResponse(String token, String email, String firstName, String lastName, String role) {
@@ -54,6 +55,15 @@ public class AuthDTOs {
             this.firstName = firstName;
             this.lastName = lastName;
             this.role = role;
+        }
+
+        public AuthResponse(String token, String email, String firstName, String lastName, String role, String avatarUrl) {
+            this.token = token;
+            this.email = email;
+            this.firstName = firstName;
+            this.lastName = lastName;
+            this.role = role;
+            this.avatarUrl = avatarUrl;
         }
 
         public AuthResponse(String message) {
@@ -65,6 +75,49 @@ public class AuthDTOs {
         public String getFirstName() { return firstName; }
         public String getLastName() { return lastName; }
         public String getRole() { return role; }
+        public String getAvatarUrl() { return avatarUrl; }
+        public String getMessage() { return message; }
+    }
+
+    public static class UpdateProfileRequest {
+        @NotBlank(message = "First name is required")
+        private String firstName;
+        @NotBlank(message = "Last name is required")
+        private String lastName;
+        private String avatarUrl;
+
+        public String getFirstName() { return firstName; }
+        public void setFirstName(String firstName) { this.firstName = firstName; }
+        public String getLastName() { return lastName; }
+        public void setLastName(String lastName) { this.lastName = lastName; }
+        public String getAvatarUrl() { return avatarUrl; }
+        public void setAvatarUrl(String avatarUrl) { this.avatarUrl = avatarUrl; }
+    }
+
+    public static class ChangePasswordRequest {
+        @NotBlank(message = "Current password is required")
+        private String currentPassword;
+        @NotBlank(message = "New password is required")
+        @Size(min = 8, message = "New password must be at least 8 characters")
+        private String newPassword;
+        @NotBlank(message = "Confirm password is required")
+        private String confirmPassword;
+
+        public String getCurrentPassword() { return currentPassword; }
+        public void setCurrentPassword(String currentPassword) { this.currentPassword = currentPassword; }
+        public String getNewPassword() { return newPassword; }
+        public void setNewPassword(String newPassword) { this.newPassword = newPassword; }
+        public String getConfirmPassword() { return confirmPassword; }
+        public void setConfirmPassword(String confirmPassword) { this.confirmPassword = confirmPassword; }
+    }
+
+    public static class MessageResponse {
+        private String message;
+
+        public MessageResponse(String message) {
+            this.message = message;
+        }
+
         public String getMessage() { return message; }
     }
 }

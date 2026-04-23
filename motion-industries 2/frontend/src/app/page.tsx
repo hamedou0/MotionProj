@@ -1,7 +1,6 @@
 'use client';
 
-import { useState, useEffect} from 'react';
-import { getUser, logout, SessionUser} from '../lib/auth';
+import { useState } from 'react';
 
 
 
@@ -84,37 +83,10 @@ export default function HomePage() {
 
   const handleSelectCategory = (category: ProductCategory) => {
     setSelectedCategory(category);
-
   };
 
-  const [user, setUser] = useState<SessionUser | null>(null)
-  useEffect(() => {
-    setUser(getUser());
-  }, []);
   return (
     <main className="min-h-screen bg-gray-50">
-  <nav className="bg-gray-900 text-white px-6 py-4 flex items-center justify-between">
-    <h1 className="text-xl font-bold">Motion Industries</h1>
-    <div className="flex gap-3 items-center text-sm">
-      <a href="/search">Products</a>
-      {user ? (
-        <>
-          <span className="text-teal-400">Hi, {user.firstName}</span>
-          <button
-            onClick={logout}
-            className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-white text-sm"
-          >
-            Sign Out
-          </button>
-        </>
-      ) : (
-        <>
-          <a href="/signin" className="hover:text-teal-400">Sign In</a>
-          <a href="/signup" className="hover:text-teal-400">Sign Up</a>
-        </>
-      )}
-    </div>
-  </nav>
 
       <section className="max-w-5xl mx-auto px-6 pt-16 pb-10 text-center">
         <p className="text-sm font-semibold tracking-wide text-teal-700 uppercase mb-3">

@@ -1,11 +1,15 @@
 // lib/auth.ts - session token helpers (Kerry's auth layer)
-import api  from "./api";
+'use client';
+
+import { useEffect, useState } from 'react';
+import api from './api';
 
 export interface SessionUser {
   email: string;
   firstName: string;
   lastName: string;
   role: string;
+  avatarUrl?: string;
 }
 
 export function saveSession(token: string, user: SessionUser) {
@@ -35,6 +39,16 @@ export function clearSession() {
   }
   localStorage.removeItem('token');
   localStorage.removeItem('user');
+}
+
+export function useSession() {
+  const [session, setSession] = useState<SessionUser | null>(null);
+
+  useEffect(() => {
+    setSession(getUser());
+  }, []);
+
+  return { data: session };
 }
 
 export async function validateSession(): Promise<boolean> {
