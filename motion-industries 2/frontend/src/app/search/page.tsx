@@ -1,17 +1,14 @@
 'use client';
-
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { getUser, logout, SessionUser } from '../../lib/auth';
 import api from '../../lib/api';
-import { UI_CATEGORIES, UICategory, matchesUICategory } from '../../lib/categoryMap';
 
 type Product = {
   id: number;
   partNumber: string;
   name: string;
   price: number;
-  category?: string;
 };
 
 const mockProducts: Product[] = [
@@ -43,19 +40,18 @@ const mockProducts: Product[] = [
   { id: 26, partNumber: 'MI-1026', name: 'Tube Fittings', price: 21.75 },
 ];
 
-function SearchContent() {
+export default function SearchPage() {
   const searchParams = useSearchParams();
   const [query, setQuery] = useState('');
   const [products, setProducts] = useState<Product[] | null>(null);
   const [loading, setLoading] = useState(false);
   const [usingFallback, setUsingFallback] = useState(false);
   const [user, setUser] = useState<SessionUser | null>(null);
-  const [activeCategory, setActiveCategory] = useState<UICategory | 'All'>('All');
-  const [subFilter, setSubFilter] = useState('');
 
   useEffect(() => {
     setUser(getUser()); // popu;ates after hydration, mo ssr mismatch
   }, []);
+
 
   const search = async (searchQuery = query) => {
     setLoading(true);
@@ -92,21 +88,36 @@ function SearchContent() {
   };
 
   useEffect(() => {
-    const urlSearch   = searchParams.get('search')   || '';
-    const urlCategory = searchParams.get('category') || '';
-    const urlSub      = searchParams.get('sub')      || '';
-
-    setQuery(urlSearch);
-    setSubFilter(urlSub);
-
-    const searchTerm = urlSearch || urlCategory;
-    search(searchTerm); // empty string → backend returns all products via findAll()
+    const urlSearchParam = searchParams.get('search') || '';
+    setQuery(urlSearchParam);
+    search(urlSearchParam);
   }, [searchParams]);
 
   return (
-    <main className="min-h-screen bg-gray-50">
+    <main className="min-h-screen bg-[#F5F5F5] text-[#333333]">
+      <nav className="bg-[#222222] text-white px-6 py-4 flex items-center justify-between border-b border-[#D62828]/70 shadow-sm">
+  <a href="/" className="text-xl font-bold">Motion Industries</a>
+  <div className="flex gap-3 items-center text-sm">
+    {user ? (
+      <>
+        <span className="text-[#0C6CD4]">Hi, {user.firstName}</span>
+        <button onClick={logout}
+          className="bg-[#0C6CD4] hover:bg-[#0a5bb2] px-4 py-2 rounded text-white text-sm">
+          Sign Out
+        </button>
+      </>
+    ) : (
+      <>
+        <a href="/signin" className="hover:text-[#0C6CD4]">Sign In</a>
+        <a href="/signup" className="text-[#0C6CD4] hover:text-[#D62828]">Register</a>
+      </>
+    )}
+  </div>
+</nav>
+
       <div className="max-w-5xl mx-auto px-6 py-10">
-        <h2 className="text-2xl font-bold mb-6">Product Search</h2>
+        <h2 className="text-2xl font-bold mb-2 text-[#333333]">Product Search</h2>
+        <div className="h-0.5 w-10 bg-[#D62828] mb-6" />
 
         <div className="flex gap-3 mb-8">
           <input
@@ -115,11 +126,11 @@ function SearchContent() {
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && search()}
             placeholder="Search by name, part number..."
-            className="flex-1 border border-gray-300 rounded-lg px-4 py-2 text-sm"
+            className="flex-1 border border-[#BDBDBD] rounded-lg px-4 py-2 text-sm text-[#333333] bg-white"
           />
           <button
             onClick={() => search()}
-            className="bg-teal-600 hover:bg-teal-700 text-white px-6 py-2 rounded-lg text-sm"
+            className="bg-[#222222] hover:bg-[#111111] text-white px-6 py-2 rounded-lg text-sm"
           >
             Search
           </button>
@@ -131,65 +142,37 @@ function SearchContent() {
           </div>
         )}
 
-        <div className="flex gap-2 mb-6 flex-wrap">
-          {(['All', ...UI_CATEGORIES] as const).map((cat) => (
-            <button
-              key={cat}
-              onClick={() => {
-                setActiveCategory(cat);
-                if (products === null) search('');
-              }}
-              className={`px-4 py-1.5 rounded-full text-sm border transition ${
-                activeCategory === cat
-                  ? 'bg-teal-600 text-white border-teal-600'
-                  : 'bg-white text-gray-700 border-gray-300 hover:border-teal-400'
-              }`}
-            >
-              {cat}
-            </button>
-          ))}
-        </div>
-
         {loading ? (
-          <div className="flex items-center gap-3 py-2 text-gray-600">
-            <span className="h-5 w-5 rounded-full border-2 border-gray-300 border-t-teal-600 animate-spin" />
+          <div className="flex items-center gap-3 py-2 text-[#555555]">
+            <span className="h-5 w-5 rounded-full border-2 border-[#BDBDBD] border-t-[#0C6CD4] animate-spin" />
             <span className="text-sm">Loading products...</span>
           </div>
         ) : products === null ? (
-          <p className="text-gray-400 text-sm">Loading products...</p>
+          <p className="text-[#666666] text-sm">Enter a search term to find products</p>
         ) : products.length === 0 ? (
-          <p className="text-gray-400 text-sm">No Results Found.</p>
+          <p className="text-[#666666] text-sm">No Results Found.</p>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {products
-              .filter((p) => {
-                if (activeCategory !== 'All' && !(p.category && matchesUICategory(p.category, activeCategory))) return false;
-                if (subFilter) {
-                  const phrase = subFilter.toLowerCase().replace(/s$/, '');
-                  if (!p.name.toLowerCase().includes(phrase)) return false;
-                }
-                return true;
-              })
-              .map((p) => (
+            {products.map((p) => (
               usingFallback ? (
                 <div
                   key={p.id}
-                  className="bg-white border border-gray-200 rounded-lg p-4 transition"
+                  className="bg-white border border-[#E5E5E5] rounded-lg p-4 transition shadow-sm"
                 >
-                  <p className="text-xs text-gray-400 mb-1">{p.partNumber}</p>
-                  <h3 className="font-semibold text-gray-900 mb-2">{p.name}</h3>
-                  <p className="text-teal-600 font-bold">${p.price}</p>
-                  <p className="mt-3 text-xs text-gray-500">Product details unavailable in sample mode</p>
+                  <p className="text-xs text-[#666666] mb-1">{p.partNumber}</p>
+                  <h3 className="font-semibold text-[#333333] mb-2">{p.name}</h3>
+                  <p className="text-[#0C6CD4] font-bold">${p.price}</p>
+                  <p className="mt-3 text-xs text-[#666666]">Product details unavailable in sample mode</p>
                 </div>
               ) : (
                 <a
                   key={p.id}
                   href={`/product/${p.id}`}
-                  className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition"
+                  className="bg-white border border-[#E5E5E5] rounded-lg p-4 hover:shadow-sm transition"
                 >
-                <p className="text-xs text-gray-400 mb-1">{p.partNumber}</p>
-                <h3 className="font-semibold text-gray-900 mb-2">{p.name}</h3>
-                <p className="text-teal-600 font-bold">${p.price}</p>
+                <p className="text-xs text-[#666666] mb-1">{p.partNumber}</p>
+                <h3 className="font-semibold text-[#333333] mb-2">{p.name}</h3>
+                <p className="text-[#0C6CD4] font-bold">${p.price}</p>
                 </a>
               )
             ))}
@@ -197,13 +180,5 @@ function SearchContent() {
         )}
       </div>
     </main>
-  );
-}
-
-export default function SearchPage() {
-  return (
-    <Suspense fallback={<p className="p-10 text-gray-500">Loading...</p>}>
-      <SearchContent />
-    </Suspense>
   );
 }
