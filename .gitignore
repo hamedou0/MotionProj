@@ -12,11 +12,13 @@
 # Environment & secrets
 *.env
 **/.env.local
+secrets.properties
 
 # IDE & OS
 .vscode/
 .idea/
 .DS_Store
 
-# Claude (personal — not for teammates)
-.claude/
+# Logs
+**/*.log
+**/spring-boot.log

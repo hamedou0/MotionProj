@@ -2,7 +2,7 @@
 **Spring 2026 | Team Project**
 
 ## Overview
-Prototype for Motion Industries that adds PDF and CSV export to individual product pages, with user authentication and an AI chatbot assistant powered by Groq (llama-3.1-8b-instant).
+Prototype for Motion Industries that adds PDF and CSV export to individual product pages, with user authentication and an AI chatbot assistant powered by Groq (llama-3.3-70b-versatile).
 
 ## Team & Ownership
 | Name | Role | Files Owned |
@@ -261,7 +261,7 @@ The frontend starts on `http://localhost:3000`.
 - **PDF includes product image** via `/api/image-proxy` (Next.js route that proxies Motion Industries CDN)
 - **CSV format** matches Motion Industries cart format (15 columns)
 - **User Auth**: JWT-based sign up / sign in with BCrypt hashed passwords
-- **AI Chatbot**: Groq LLM (llama-3.1-8b-instant) with rule-based fallback
+- **AI Chatbot**: Groq LLM (llama-3.3-70b-versatile) with rule-based fallback
 
 ---
 
