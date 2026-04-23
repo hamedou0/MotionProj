@@ -1,0 +1,5 @@
+-- Backfill image_url for original 8 seed products (confirmed CDN URLs only)
+UPDATE products SET image_url = 'https://content.motion.com/cdn-cgi/image/width=1920,fit=scale-down,onerror=redirect,anim=false,format=auto,metadata=none/motion3/fsdb/images/item/timken-single-row-deep-groove-ball-bearing-6000-2RS-6205-2RS-angle-view.jpg' WHERE part_number = 'MI-BRG-001';
+UPDATE products SET image_url = 'https://content.motion.com/cdn-cgi/image/width=1920,fit=scale-down,onerror=redirect,anim=false,format=auto,metadata=none/motion3/fsdb/images/item/SKF_0901d196808e8910.jpg' WHERE part_number = 'MI-BRG-002';
+UPDATE products SET image_url = 'https://content.motion.com/cdn-cgi/image/width=1920,fit=scale-down,onerror=redirect,anim=false,format=auto,metadata=none/motion3/fsdb/images/item/071_125__1_.jpg' WHERE part_number = 'MI-MTR-001';
+UPDATE products SET image_url = 'https://content.motion.com/cdn-cgi/image/width=1920,fit=scale-down,onerror=redirect,anim=false,format=auto,metadata=none/motion3/fsdb/images/item/L0305-098.jpg' WHERE part_number = 'MI-LUB-001';
