@@ -2,6 +2,18 @@
 
 import { useState, useEffect} from 'react';
 import { getUser, logout, SessionUser} from '../lib/auth';
+import api from '../lib/api';
+
+type Product = {
+  id: number;
+  partNumber: string;
+  name: string;
+  description: string;
+  price: number;
+  category: string;
+  inStock: boolean;
+  imageUrl?: string;
+};
 
 
 
@@ -41,20 +53,6 @@ const productCategories: ProductCategory[] = [
   },
 ];
 
-const featuredSolutions = [
-  {
-    title: 'MRO Solutions',
-    description: 'Keep operations running with maintenance, repair, and replacement essentials.',
-  },
-  {
-    title: 'Facility Essentials',
-    description: 'Stock daily-use products that support clean, efficient, and reliable facilities.',
-  },
-  {
-    title: 'Safety',
-    description: 'Protect your team with trusted PPE and jobsite safety products.',
-  },
-];
 
 const popularCategories = [
   'Bearings',
@@ -83,9 +81,17 @@ export default function HomePage() {
 
   };
 
-  const [user, setUser] = useState<SessionUser | null>(null)
+  const [user, setUser] = useState<SessionUser | null>(null);
+  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
+
   useEffect(() => {
     setUser(getUser());
+  }, []);
+
+  useEffect(() => {
+    api.get<Product[]>('/products')
+      .then((res) => setFeaturedProducts(res.data.slice(0, 3)))
+      .catch(() => {});
   }, []);
   return (
     <main className="min-h-screen bg-[#F5F5F5] text-[#333333]">
@@ -212,15 +218,16 @@ export default function HomePage() {
         </div>
         <div className="h-0.5 w-10 bg-[#D62828] mb-5" />
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {featuredSolutions.map((item) => (
-            <div key={item.title} className="bg-white border border-[#E5E5E5] rounded-xl p-5 shadow-sm">
-              <h4 className="text-lg font-semibold text-[#333333] mb-2">{item.title}</h4>
-              <p className="text-sm text-[#555555] mb-4">{item.description}</p>
+          {featuredProducts.map((product) => (
+            <div key={product.id} className="bg-white border border-[#E5E5E5] rounded-xl p-5 shadow-sm">
+              <p className="text-xs text-[#888888] uppercase mb-1">{product.category}</p>
+              <h4 className="text-lg font-semibold text-[#333333] mb-2">{product.name}</h4>
+              <p className="text-sm text-[#555555] mb-4 line-clamp-2">{product.description}</p>
               <a
-                href="/search"
+                href={`/product/${product.id}`}
                 className="inline-block text-sm font-medium text-[#0C6CD4] hover:text-[#D62828]"
               >
-                Browse
+                View Product
               </a>
             </div>
           ))}
